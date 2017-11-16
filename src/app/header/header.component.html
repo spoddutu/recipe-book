@@ -1,5 +1,6 @@
 <nav class="navbar navbar-default">
 	<div class="container-fluid">
+		<span class="col-xs-12 well-lg" *ngIf="status" style="background-color: lightgreen; position: absolute;">{{status}}</span>
 		<div class="navbar-header">
 			<a href="#" class="navbar-brand">Recipe Book</a>
 		</div>
@@ -10,13 +11,18 @@
 				<li routerLinkActive="active"><a routerLink="shopping-list">Shopping List</a></li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<li class="dropdown" appDropdown>
-					<a href="#" class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
+				<ng-template [ngIf]="!authService.isAuthenticated()">
+					<li><a routerLink="signup">Register</a></li>
+					<li><a routerLink="signin">Login</a></li>
+				</ng-template>
+				<li class="dropdown" appDropdown *ngIf="authService.isAuthenticated()">
+					<a class="dropdown-toggle" role="button">Manage <span class="caret"></span></a>
 					<ul class="dropdown-menu">
-						<li><a href="#">Save Data</a></li>
-						<li><a href="#">Fetch Data</a></li>
+						<li><a (click)="saveData()">Save Data</a></li>
+						<li><a (click)="fetchData()">Fetch Data</a></li>
 					</ul>
 				</li>
+				<li><a (click)="doLogout()" *ngIf="authService.isAuthenticated()" style="cursor: pointer;">Logout</a></li>
 			</ul>
 		</div>
 	</div>
