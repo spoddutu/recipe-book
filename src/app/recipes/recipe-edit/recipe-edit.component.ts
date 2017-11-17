@@ -1,16 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
+import { Observable } from 'rxjs/Observable';
 
 import { RecipeService } from '../recipe.service';
 import { Recipe } from '../recipe.model';
+import { CanComponentDeactivate } from '../../shared/deactivate-gaurd.service';
 
 @Component({
   selector: 'app-recipe-edit',
   templateUrl: './recipe-edit.component.html',
   styleUrls: ['./recipe-edit.component.css']
 })
-export class RecipeEditComponent implements OnInit {
+export class RecipeEditComponent implements OnInit, CanComponentDeactivate {
   id: number;
   canEdit = false;
   recipeForm: FormGroup;
@@ -59,6 +61,7 @@ export class RecipeEditComponent implements OnInit {
       'name': new FormControl(null, Validators.required),
       'amount': new FormControl(null, [Validators.required, Validators.pattern(/^[1-9]+[0-9]*$/)])
     }));
+    console.error(this.recipeForm);
   }
 
   onSubmit(){
@@ -81,6 +84,23 @@ export class RecipeEditComponent implements OnInit {
 
   deleteIngredient(index: number){
     (<FormArray>this.recipeForm.get('ingredients')).removeAt(index);
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if(this.anyChanges()){
+      return confirm('Do you want to discard the changes');
+    }
+    return true;
+  }
+
+  private anyChanges(): boolean {
+    let controls = this.recipeForm.controls;
+    for(let key  of Object.keys(controls)){
+      if(controls[key].dirty) {
+        return true;
+      }
+    }
+    return false;
   }
 
 }

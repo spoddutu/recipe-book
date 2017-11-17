@@ -1,16 +1,19 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs/Subscription';
+import { Observable } from 'rxjs/Observable';
 
 import { Ingredient } from '../../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list.service';
+
+import { CanComponentDeactivate } from '../../shared/deactivate-gaurd.service';
 
 @Component({
   selector: 'app-shopping-edit',
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css']
 })
-export class ShoppingEditComponent implements OnInit, OnDestroy {
+export class ShoppingEditComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   @ViewChild('shoppingListForm') shoppingListFormRef: NgForm;
   editItemSub: Subscription;
   editMode: boolean = false;
@@ -54,5 +57,22 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(){
     this.editItemSub.unsubscribe();
+  }
+
+  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
+    if(this.anyChanges()){
+      return confirm('Do you want to discard the changes');
+    }
+    return true;
+  }
+
+  private anyChanges(): boolean {
+    let controls = this.shoppingListFormRef.controls;
+    for(let key  of Object.keys(controls)){
+      if(controls[key].dirty) {
+        return true;
+      }
+    }
+    return false;
   }
 }
