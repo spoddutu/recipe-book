@@ -10,7 +10,7 @@ import { AuthGuard } from '../auth/auth-guard.service';
 import { CanDeactivateGaurd } from '../shared/deactivate-gaurd.service';
 
 const appRoutes: Routes = [
-  { path: 'recipes', component: RecipesComponent, children:[
+  { path: '', component: RecipesComponent, children:[
     { path: '', component: RecipeStartComponent},
     { path: 'new', component: RecipeEditComponent, canActivate: [AuthGuard], canDeactivate: [CanDeactivateGaurd]},
   	{ path: ':id', component: RecipeDetailComponent},

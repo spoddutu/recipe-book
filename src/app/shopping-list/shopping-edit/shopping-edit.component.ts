@@ -6,14 +6,12 @@ import { Observable } from 'rxjs/Observable';
 import { Ingredient } from '../../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list.service';
 
-import { CanComponentDeactivate } from '../../shared/deactivate-gaurd.service';
-
 @Component({
   selector: 'app-shopping-edit',
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css']
 })
-export class ShoppingEditComponent implements OnInit, OnDestroy, CanComponentDeactivate {
+export class ShoppingEditComponent implements OnInit, OnDestroy {
   @ViewChild('shoppingListForm') shoppingListFormRef: NgForm;
   editItemSub: Subscription;
   editMode: boolean = false;
@@ -30,6 +28,16 @@ export class ShoppingEditComponent implements OnInit, OnDestroy, CanComponentDea
         'name': ingredient.name,
         'amount': ingredient.amount
       });
+    });
+    let changed = false;
+    this.shoppingListFormRef.valueChanges.subscribe(data => {
+      for (var key in data) {
+        if(data[key]){
+          changed = true;
+          break;
+        }
+      }
+      this.shoppingListService.formChanged.next(changed);
     });
   }
 
@@ -59,20 +67,13 @@ export class ShoppingEditComponent implements OnInit, OnDestroy, CanComponentDea
     this.editItemSub.unsubscribe();
   }
 
-  canDeactivate(): Observable<boolean> | Promise<boolean> | boolean {
-    if(this.anyChanges()){
-      return confirm('Do you want to discard the changes');
-    }
-    return true;
-  }
-
-  private anyChanges(): boolean {
-    let controls = this.shoppingListFormRef.controls;
-    for(let key  of Object.keys(controls)){
-      if(controls[key].dirty) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // private anyChanges(): boolean {
+  //   let controls = this.shoppingListFormRef.controls;
+  //   for(let key  of Object.keys(controls)){
+  //     if(controls[key].dirty) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 }

@@ -8,6 +8,7 @@ export class ShoppingListService{
 	    new Ingredient('Tomatos', 10)
 	  ];
 	ingredientsChanged = new Subject<Ingredient[]>();
+	formChanged = new Subject<boolean>();
 	editItem = new Subject<number>();
 
 	getIngredient(){
